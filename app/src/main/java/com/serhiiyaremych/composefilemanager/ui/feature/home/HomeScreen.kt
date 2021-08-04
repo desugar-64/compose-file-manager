@@ -8,35 +8,37 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.LayoutDirection.Ltr
 import androidx.compose.ui.unit.dp
 import com.serhiiyaremych.composefilemanager.ui.theme.ComposeFileManagerTheme
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun HomeScreen() {
-    Column(modifier = Modifier.fillMaxSize()) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .requiredHeight(56.dp)
-                .clip(RoundedCornerShape(16.dp))
-                .background(Color.Green),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(text = "Search area", fontWeight = FontWeight.Bold)
-        }
-
+fun HomeScreen(
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(16.dp)
+) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(top = contentPadding.calculateTopPadding())
+    ) {
+        SearchBar(
+            modifier = Modifier.padding(
+                horizontal = contentPadding.calculateStartPadding(Ltr)
+            ),
+            onClick = {})
         Spacer(modifier = Modifier.requiredHeight(32.dp))
 
-        LazyRow(modifier = Modifier.fillMaxWidth()) {
+        LazyRow(
+            modifier = Modifier.fillMaxWidth(),
+            contentPadding = PaddingValues(horizontal = contentPadding.calculateLeftPadding(Ltr))
+        ) {
             items(3) {
                 Box(
                     modifier = Modifier

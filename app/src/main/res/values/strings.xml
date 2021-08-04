@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Compose File Manager</string>
+    <string name="file_search_hint">Search some file</string>
 </resources>
