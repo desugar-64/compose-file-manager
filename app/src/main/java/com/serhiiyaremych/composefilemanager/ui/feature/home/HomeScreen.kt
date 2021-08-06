@@ -18,7 +18,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection.Ltr
 import androidx.compose.ui.unit.dp
 import com.serhiiyaremych.composefilemanager.R
-import com.serhiiyaremych.composefilemanager.ui.theme.Color4
 import com.serhiiyaremych.composefilemanager.ui.theme.ComposeFileManagerTheme
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -50,7 +49,12 @@ fun HomeScreen(
                 StorageCard(
                     surfaceColor = color,
                     contentAccentColor = accentColor,
-                    cardName = stringResource(R.string.card_internal_storage)
+                    state = StorageCardState(
+                        cardTitle = stringResource(R.string.card_internal_storage),
+                        usedStorageBytes = 0,
+                        totalStorageBytes = 0,
+                        storageDataFormatter = { "$it bytes" }
+                    )
                 )
 
                 Spacer(modifier = Modifier.width(16.dp))

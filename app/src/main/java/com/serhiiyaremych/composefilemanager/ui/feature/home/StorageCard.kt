@@ -8,6 +8,8 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.SdCard
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -17,13 +19,36 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serhiiyaremych.composefilemanager.ui.theme.ComposeFileManagerTheme
 
+@Stable
+data class StorageCardState(
+    val cardTitle: String,
+    val usedStorageBytes: Long,
+    val totalStorageBytes: Long,
+    val storageDataFormatter: (Long) -> String
+) {
+    val usedStorageFormatted: String
+        get() = storageDataFormatter.invoke(usedStorageBytes)
+
+    val totalStorageFormatted: String
+        get() = storageDataFormatter.invoke(totalStorageBytes)
+
+    companion object {
+        fun init() = StorageCardState(
+            cardTitle = "Unknown",
+            usedStorageBytes = 0,
+            totalStorageBytes = 0,
+            storageDataFormatter = { "-" }
+        )
+    }
+}
+
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun StorageCard(
     surfaceColor: Color,
     contentAccentColor: Color,
-    cardName: String
+    state: StorageCardState = remember(StorageCardState::init)
 ) {
     Card(
         onClick = { /*TODO*/ },
@@ -57,7 +82,7 @@ fun StorageCard(
             ) {
                 Column {
                     Text(
-                        text = cardName,
+                        text = state.cardTitle,
                         style = MaterialTheme.typography.body1.copy(
                             fontWeight = FontWeight.Bold,
                             color = contentAccentColor
@@ -65,7 +90,7 @@ fun StorageCard(
                     )
                     Spacer(modifier = Modifier.size(8.dp))
                     Text(
-                        text = "67 Gb / 128 Gb",
+                        text = "${state.usedStorageFormatted} / ${state.totalStorageFormatted}",
                         style = MaterialTheme.typography.caption.copy(fontWeight = FontWeight.Bold)
                     )
                 }
@@ -83,8 +108,7 @@ private fun StoragePreview() {
     ComposeFileManagerTheme {
         StorageCard(
             surfaceColor = MaterialTheme.colors.background,
-            contentAccentColor = Color.White,
-            "Internal storage"
+            contentAccentColor = Color.White
         )
     }
 }
