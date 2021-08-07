@@ -48,10 +48,11 @@ data class StorageCardState(
 fun StorageCard(
     surfaceColor: Color,
     contentAccentColor: Color,
-    state: StorageCardState = remember(StorageCardState::init)
+    state: StorageCardState = remember(StorageCardState::init),
+    onClick: () -> Unit
 ) {
     Card(
-        onClick = { /*TODO*/ },
+        onClick = onClick,
         backgroundColor = surfaceColor,
         modifier = Modifier.size(250.dp, 150.dp)
     ) {
@@ -72,9 +73,11 @@ fun StorageCard(
                             .copy(alpha = 0.2f)
                             .compositeOver(surfaceColor)
                     )
-                    .padding(6.dp)
+                    .padding(5.dp)
             )
+
             Spacer(modifier = Modifier.size(16.dp))
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.Bottom,
@@ -109,6 +112,6 @@ private fun StoragePreview() {
         StorageCard(
             surfaceColor = MaterialTheme.colors.background,
             contentAccentColor = Color.White
-        )
+        ) { }
     }
 }
