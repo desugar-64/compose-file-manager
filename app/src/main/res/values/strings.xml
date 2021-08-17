@@ -2,4 +2,12 @@
     <string name="app_name">Compose File Manager</string>
     <string name="file_search_hint">Search some file</string>
     <string name="card_internal_storage">Internal storage</string>
+    <string name="images">Images</string>
+    <string name="videos">Videos</string>
+    <string name="music">Music</string>
+    <string name="apps">Apps</string>
+    <string name="zip_files">Zip Files</string>
+    <string name="document">Documents</string>
+    <string name="downloads">Downloads</string>
+    <string name="add">Add</string>
 </resources>

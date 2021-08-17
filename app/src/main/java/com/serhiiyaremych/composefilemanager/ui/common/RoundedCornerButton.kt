@@ -2,6 +2,7 @@ package com.serhiiyaremych.composefilemanager.ui.common
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.*
@@ -32,7 +33,7 @@ fun RoundedCornerButton(
     ) {
         IconButton(
             onClick = onClick,
-            modifier = modifier.size(64.dp, 64.dp)
+            modifier = modifier
                 .background(
                     color = MaterialTheme.colors.background,
                     shape = Shapes.medium
@@ -51,6 +52,6 @@ fun RoundedCornerButton(
 @Composable
 fun RoundedCornerButtonPreview() {
     ComposeFileManagerTheme {
-        RoundedCornerButton(icon = Icons.Rounded.Image, tintColor = Color.Magenta) { }
+        RoundedCornerButton(modifier = Modifier.size(64.dp), icon = Icons.Rounded.Image, tintColor = Color.Magenta) { }
     }
 }
