@@ -14,13 +14,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.serhiiyaremych.composefilemanager.ui.common.CircularProgressBar
 import com.serhiiyaremych.composefilemanager.ui.theme.ComposeFileManagerTheme
 
 @Stable
 data class StorageCardState(
+    val cardLogo: ImageVector,
     val cardTitle: String,
     val usedStorageBytes: Long,
     val totalStorageBytes: Long,
@@ -34,6 +42,7 @@ data class StorageCardState(
 
     companion object {
         fun init() = StorageCardState(
+            cardLogo = Icons.Rounded.SdCard,
             cardTitle = "Unknown",
             usedStorageBytes = 0,
             totalStorageBytes = 0,
@@ -62,7 +71,7 @@ fun StorageCard(
                 .padding(24.dp)
         ) {
             Icon(
-                imageVector = Icons.Rounded.SdCard,
+                imageVector = state.cardLogo,
                 contentDescription = null,
                 tint = Color.White
                     .compositeOver(contentAccentColor),
@@ -98,7 +107,27 @@ fun StorageCard(
                     )
                 }
 
-                CircularProgressIndicator(progress = 0.95f, color = contentAccentColor)
+                Box(contentAlignment = Alignment.Center) {
+                    CircularProgressBar(
+                        modifier = Modifier.size(48.dp, 48.dp),
+                        backgroundStrokeWidth = 2.dp,
+                        backgroundStrokeColor = Color.LightGray,
+                        progressStrokeWidth = 5.dp,
+                        progressStrokeColor = contentAccentColor,
+                        progress = 0.65f
+                    )
+                    Text(
+                        text = buildAnnotatedString {
+                            withStyle(SpanStyle(fontSize = 14.sp)) {
+                                append("65")
+                            }
+                            withStyle(SpanStyle(fontSize = 10.sp)) {
+                                append("%")
+                            }
+                        },
+                        textAlign = TextAlign.Center
+                    )
+                }
             }
         }
     }

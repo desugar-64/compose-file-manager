@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection.Ltr
@@ -19,7 +20,6 @@ import androidx.compose.ui.unit.dp
 import com.serhiiyaremych.composefilemanager.R
 import com.serhiiyaremych.composefilemanager.ui.common.dashBorder
 import com.serhiiyaremych.composefilemanager.ui.theme.ComposeFileManagerTheme
-import com.serhiiyaremych.composefilemanager.ui.theme.Shapes
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
@@ -51,6 +51,7 @@ fun HomeScreen(
                     surfaceColor = color,
                     contentAccentColor = accentColor,
                     state = StorageCardState(
+                        cardLogo = Icons.Rounded.SdCard,
                         cardTitle = stringResource(R.string.card_internal_storage),
                         usedStorageBytes = 0,
                         totalStorageBytes = 0,
@@ -64,6 +65,7 @@ fun HomeScreen(
 
         Spacer(modifier = Modifier.requiredHeight(32.dp))
 
+        // TODO: make own data source for resource tiles
         val images = stringResource(R.string.images)
         val videos = stringResource(R.string.videos)
         val music = stringResource(R.string.music)
@@ -74,14 +76,14 @@ fun HomeScreen(
         val add = stringResource(R.string.add)
         val tiles = remember {
             listOf(
-                Tile.Images(images, Icons.Rounded.Image, Color(0xFF673AB7)),
-                Tile.Videos(videos, Icons.Rounded.VideoLibrary, Color(0xFFF44336)),
-                Tile.Music(music, Icons.Rounded.LibraryMusic, Color(0xFFFF9800)),
-                Tile.Apps(apps, Icons.Rounded.Apps, Color(0xFF03A9F4)),
-                Tile.ZipFiles(zipFiles, Icons.Rounded.Archive, Color(0xFF838383)),
-                Tile.Documents(documents, Icons.Rounded.ListAlt, Color(0xFF1C70B3)),
-                Tile.Downloads(downloads, Icons.Rounded.Download, Color(0xFF009688)),
-                Tile.Custom(add, Icons.Rounded.Add, Color(0xFF03A9F4), ""),
+                ResourceTile.Images(images, Icons.Rounded.Image, Color(0xFF673AB7)),
+                ResourceTile.Videos(videos, Icons.Rounded.VideoLibrary, Color(0xFFF44336)),
+                ResourceTile.Music(music, Icons.Rounded.LibraryMusic, Color(0xFFFF9800)),
+                ResourceTile.Apps(apps, Icons.Rounded.Apps, Color(0xFF03A9F4)),
+                ResourceTile.ZipFiles(zipFiles, Icons.Rounded.Archive, Color(0xFF838383)),
+                ResourceTile.Documents(documents, Icons.Rounded.ListAlt, Color(0xFF1C70B3)),
+                ResourceTile.Downloads(downloads, Icons.Rounded.Download, Color(0xFF009688)),
+                ResourceTile.Add(add, Icons.Rounded.Add, Color(0xFF03A9F4)),
             ).chunked(4)
         }
 
@@ -93,31 +95,19 @@ fun HomeScreen(
                 )
         ) {
 
-            tiles
-                .forEachIndexed { index, row ->
-                    if (index > 0) {
-                        Spacer(modifier = Modifier.height(16.dp))
-                    }
-                    SpaceBetweenItem {
-
-                        row.forEach { tile ->
-                            val tileBgStroke = if (tile is Tile.Custom) {
-                                Modifier
-                                    .dashBorder(
-                                        intervals = { floatArrayOf(10.dp.toPx(), 5.dp.toPx()) },
-                                        strokeLineWidth = 6f,
-                                        strokeColor = Color.LightGray,
-                                        cornerRadius = 16.dp
-                                    )
-                            } else Modifier
-
-                            ResourceTile(
-                                modifier = tileBgStroke,
-                                tile = tile,
-                                onClick = {})
-                        }
+            tiles.forEachIndexed { index, row ->
+                if (index > 0) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+                SpaceBetweenItem {
+                    row.forEach { tile ->
+                        ResourceTile(
+                            tile = tile,
+                            showDashBorder = tile is ResourceTile.Add,
+                            onClick = {})
                     }
                 }
+            }
 
         }
 

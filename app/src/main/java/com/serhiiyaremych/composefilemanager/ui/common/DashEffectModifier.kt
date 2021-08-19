@@ -1,5 +1,6 @@
 package com.serhiiyaremych.composefilemanager.ui.common
 
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.DrawModifier
@@ -16,9 +17,9 @@ import androidx.compose.ui.unit.Dp
 
 fun Modifier.dashBorder(
     intervals: Density.() -> FloatArray,
-    strokeLineWidth: Float,
+    strokeLineWidth: Density.() -> Float,
     strokeColor: Color,
-    cornerRadius: Dp
+    cornerRadius: CornerSize
 ): Modifier = composed(
     inspectorInfo = debugInspectorInfo {
         name = "dashBorder"
@@ -28,7 +29,7 @@ fun Modifier.dashBorder(
         this.then(
             DashEffectModifier(
                 intervals = with(LocalDensity.current) { intervals.invoke(this) },
-                strokeLineWidth = strokeLineWidth,
+                strokeLineWidth = with(LocalDensity.current) { strokeLineWidth.invoke(this) },
                 strokeColor = strokeColor,
                 cornerRadius = cornerRadius
             )
@@ -40,7 +41,7 @@ private class DashEffectModifier(
     intervals: FloatArray,
     strokeLineWidth: Float,
     private val strokeColor: Color,
-    private val cornerRadius: Dp
+    private val cornerRadius: CornerSize
 ) : DrawModifier {
 
     private val paint: Paint = Paint().apply {
@@ -59,8 +60,8 @@ private class DashEffectModifier(
                 top = 0f,
                 right = size.width,
                 bottom = size.height,
-                radiusX = cornerRadius.toPx(),
-                radiusY = cornerRadius.toPx(),
+                radiusX = cornerRadius.toPx(size, this),
+                radiusY = cornerRadius.toPx(size, this),
                 paint = paint
             )
         }
