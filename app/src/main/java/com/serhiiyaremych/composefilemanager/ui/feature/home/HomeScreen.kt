@@ -12,13 +12,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection.Ltr
 import androidx.compose.ui.unit.dp
 import com.serhiiyaremych.composefilemanager.R
-import com.serhiiyaremych.composefilemanager.ui.common.dashBorder
 import com.serhiiyaremych.composefilemanager.ui.theme.ComposeFileManagerTheme
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
@@ -53,8 +51,9 @@ fun HomeScreen(
                     state = StorageCardState(
                         cardLogo = Icons.Rounded.SdCard,
                         cardTitle = stringResource(R.string.card_internal_storage),
-                        usedStorageBytes = 0,
-                        totalStorageBytes = 0,
+//                        usedStorageBytes = (1024 / (index + 2)).toLong(),
+                        usedStorageBytes = (512).toLong(),
+                        totalStorageBytes = 1024,
                         storageDataFormatter = { "$it bytes" }
                     )
                 ) { /* TODO onClick */ }

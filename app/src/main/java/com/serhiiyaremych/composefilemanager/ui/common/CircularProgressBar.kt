@@ -1,5 +1,6 @@
 package com.serhiiyaremych.composefilemanager.ui.common
 
+import androidx.annotation.ColorRes
 import androidx.annotation.FloatRange
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.padding
@@ -9,15 +10,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithCache
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.center
+import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
+import com.serhiiyaremych.composefilemanager.ui.theme.Color1
 import com.serhiiyaremych.composefilemanager.ui.theme.ComposeFileManagerTheme
 
 @Composable
@@ -35,9 +38,16 @@ fun CircularProgressBar(
     val (progressStroke, setProgressStroke) = remember {
         mutableStateOf(Stroke())
     }
+    val (gradientBrush, setBrush) = remember {
+        mutableStateOf(Brush.radialGradient(listOf(progressStrokeColor, progressStrokeColor)))
+    }
     val contentPadding = max(backgroundStrokeWidth, progressStrokeWidth) / 2
     Canvas(modifier = modifier
         .drawWithCache {
+            val gradient = Brush.sweepGradient(
+                colors = listOf(Color.Transparent,progressStrokeColor, progressStrokeColor)
+            )
+            setBrush.invoke(gradient)
             setBackgroundStroke.invoke(Stroke(width = backgroundStrokeWidth.toPx()))
             setProgressStroke.invoke(
                 Stroke(
@@ -47,16 +57,19 @@ fun CircularProgressBar(
                 )
             )
             onDrawWithContent(ContentDrawScope::drawContent)
-        }.padding(contentPadding)
+        }
+        .padding(contentPadding)
     ) {
-        drawCircle(color = backgroundStrokeColor, style = backgroundStroke)
-        drawArc(
-            color = progressStrokeColor,
-            startAngle = 270f,
-            sweepAngle = 360 * progress,
-            useCenter = false,
-            style = progressStroke
-        )
+        rotate(270f) {
+            drawCircle(color = backgroundStrokeColor, style = backgroundStroke)
+            drawArc(
+                brush = gradientBrush,
+                startAngle = 0f,
+                sweepAngle = 360 * progress,
+                useCenter = false,
+                style = progressStroke
+            )
+        }
     }
 }
 
