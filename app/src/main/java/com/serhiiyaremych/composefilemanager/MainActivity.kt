@@ -16,9 +16,11 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.center
 import androidx.compose.ui.unit.toOffset
-import com.serhiiyaremych.composefilemanager.ext.darker
-import com.serhiiyaremych.composefilemanager.ext.lighter
+import com.serhiiyaremych.composefilemanager.ext.darken
+import com.serhiiyaremych.composefilemanager.ext.lighten
 import com.serhiiyaremych.composefilemanager.ui.feature.home.HomeScreen
+import com.serhiiyaremych.composefilemanager.ui.theme.Color1
+import com.serhiiyaremych.composefilemanager.ui.theme.Color2
 import com.serhiiyaremych.composefilemanager.ui.theme.ComposeFileManagerTheme
 
 class MainActivity : ComponentActivity() {
@@ -26,12 +28,16 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             ComposeFileManagerTheme {
-                // A surface container using the 'background' color from the theme
+                val surfaceColor = if (MaterialTheme.colors.isLight) {
+                    Color1
+                } else {
+                    MaterialTheme.colors.surface
+                }
                 val gradient = listOf(
-                    MaterialTheme.colors.surface.lighter(0.01f),
-                    MaterialTheme.colors.surface,
-                    MaterialTheme.colors.surface.darker(0.01f),
-                    MaterialTheme.colors.surface.darker(0.02f),
+                    surfaceColor.lighten(0.01f),
+                    surfaceColor,
+                    surfaceColor.darken(0.01f),
+                    surfaceColor.darken(0.02f),
                 )
                 var componentSize by remember {
                     mutableStateOf(IntSize.Zero)

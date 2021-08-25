@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.serhiiyaremych.composefilemanager.ext.lighten
 import com.serhiiyaremych.composefilemanager.ui.theme.ComposeFileManagerTheme
 import com.serhiiyaremych.composefilemanager.ui.theme.Shapes
 
@@ -39,7 +40,7 @@ fun RoundedCornerButton(
             onClick = onClick,
             modifier = modifier
                 .background(
-                    color = MaterialTheme.colors.background.copy(alpha = 0.5f),
+                    color = MaterialTheme.colors.background.copy(alpha = 0.5f).lighten(0.3f),
                     shape = backgroundShape
                 )
                 .padding(8.dp)

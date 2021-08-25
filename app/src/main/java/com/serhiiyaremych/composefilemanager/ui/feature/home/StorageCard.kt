@@ -1,6 +1,7 @@
 package com.serhiiyaremych.composefilemanager.ui.feature.home
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import androidx.annotation.FloatRange
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.LocalIndication
@@ -25,10 +26,8 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.graphics.vector.VectorPainter
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
@@ -38,47 +37,25 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.serhiiyaremych.composefilemanager.ext.darker
-import com.serhiiyaremych.composefilemanager.ext.lighter
+import com.serhiiyaremych.composefilemanager.ext.darken
+import com.serhiiyaremych.composefilemanager.ext.lighten
 import com.serhiiyaremych.composefilemanager.ui.common.CircularProgressBar
 import com.serhiiyaremych.composefilemanager.ui.theme.ComposeFileManagerTheme
 import com.serhiiyaremych.composefilemanager.ui.theme.Shapes
 import kotlin.math.roundToInt
 
-@Stable
-data class StorageCardState(
-    val cardLogo: ImageVector,
-    val cardTitle: String,
-    val usedStorageBytes: Long,
-    val totalStorageBytes: Long,
-    val storageDataFormatter: (Long) -> String
-) {
-    val usedStorageFormatted: String
-        get() = storageDataFormatter.invoke(usedStorageBytes)
-
-    val totalStorageFormatted: String
-        get() = storageDataFormatter.invoke(totalStorageBytes)
-
-    companion object {
-        fun init() = StorageCardState(
-            cardLogo = Icons.Rounded.SdCard,
-            cardTitle = "Unknown",
-            usedStorageBytes = 0,
-            totalStorageBytes = 0,
-            storageDataFormatter = { "-" }
-        )
-    }
-}
-
-
 @Composable
 fun StorageCard(
+    dataIcon: Painter,
+    dataIconTintColor: Color = Color.Unspecified,
     surfaceColor: Color,
     contentAccentColor: Color,
-    state: StorageCardState = remember(StorageCardState::init),
+    cardTitle: String,
+    cardText: String,
+    @FloatRange(from = 0.0, to = 1.0) usedSpacePercentage: Float,
     onClick: () -> Unit
 ) {
-    val ripple = rememberRipple(color = surfaceColor)
+    val ripple = rememberRipple(color = surfaceColor.lighten(0.7f))
 
     CompositionLocalProvider(LocalIndication provides ripple) {
         Box(
@@ -89,14 +66,14 @@ fun StorageCard(
         ) {
             val isLightTheme = MaterialTheme.colors.isLight
             val progress by animateFloatAsState(
-                targetValue = state.usedStorageBytes / state.totalStorageBytes.toFloat(),
-                animationSpec = tween(durationMillis = 3000)
+                targetValue = usedSpacePercentage,
+                animationSpec = tween(durationMillis = 1500)
             )
-            val alpha = if (isLightTheme) 0.3f else 0.1f
+            val alpha = if (isLightTheme) 0.4f else 0.2f
             val color = if (surfaceColor == Color.White)
-                surfaceColor.darker(0.2f)
+                surfaceColor.darken(0.2f)
             else
-                surfaceColor.lighter(0.7f)
+                surfaceColor.lighten(0.6f)
 
             val progressLineColor = color.copy(alpha = alpha)
             var containerSize by remember { mutableStateOf(Size.Zero) }
@@ -132,9 +109,9 @@ fun StorageCard(
                     .padding(16.dp)
             ) {
                 Icon(
-                    imageVector = state.cardLogo,
+                    painter = dataIcon,
                     contentDescription = null,
-                    tint = Color.White.compositeOver(contentAccentColor),
+                    tint = dataIconTintColor,
                     modifier = Modifier
                         .background(
                             shape = MaterialTheme.shapes.small.copy(CornerSize(10.dp)),
@@ -153,7 +130,7 @@ fun StorageCard(
                 ) {
                     Column {
                         Text(
-                            text = state.cardTitle,
+                            text = cardTitle,
                             style = MaterialTheme.typography.body1.copy(
                                 fontWeight = FontWeight.Bold,
                                 color = contentAccentColor
@@ -161,7 +138,7 @@ fun StorageCard(
                         )
                         Spacer(modifier = Modifier.size(8.dp))
                         Text(
-                            text = "${state.usedStorageFormatted} / ${state.totalStorageFormatted}",
+                            text = cardText,
                             style = MaterialTheme.typography.caption.copy(fontWeight = FontWeight.Bold),
                             color = contentAccentColor
                         )
@@ -226,46 +203,15 @@ private fun BackgroundProgress(
 private fun generateCardGradientColors(color: Color): List<Color> {
     return if (color == Color.White) {
         listOf(
-            color.darker(0.05f),
-            color.darker(0.03f),
+            color.darken(0.03f),
+            color.darken(0.01f),
             color,
         )
     } else {
         listOf(
             color,
-            color.lighter(0.3f),
-            color.lighter(0.5f)
-        )
-    }
-}
-
-@Composable
-private fun SpaceUsed(
-    usedStorageBytes: Long,
-    totalStorageBytes: Long,
-    contentAccentColor: Color
-) {
-    Box(contentAlignment = Alignment.Center) {
-        val progress = usedStorageBytes / totalStorageBytes.toFloat()
-        val textProgress = (progress * 100).roundToInt().coerceIn(0, 100)
-        CircularProgressBar(
-            modifier = Modifier.size(48.dp, 48.dp),
-            backgroundStrokeWidth = 2.dp,
-            backgroundStrokeColor = Color.LightGray,
-            progressStrokeWidth = 5.dp,
-            progressStrokeColor = contentAccentColor,
-            progress = progress
-        )
-        Text(
-            text = buildAnnotatedString {
-                withStyle(SpanStyle(fontSize = 14.sp)) {
-                    append("$textProgress")
-                }
-                withStyle(SpanStyle(fontSize = 10.sp)) {
-                    append("%")
-                }
-            },
-            textAlign = TextAlign.Center
+            color.lighten(0.1f),
+            color.lighten(0.3f)
         )
     }
 }
@@ -276,9 +222,13 @@ private fun SpaceUsed(
 private fun StoragePreview() {
     ComposeFileManagerTheme {
         StorageCard(
-            state = StorageCardState.init().copy(totalStorageBytes = 512, usedStorageBytes = 380),
             surfaceColor = MaterialTheme.colors.background,
-            contentAccentColor = Color.White
-        ) { }
+            contentAccentColor = MaterialTheme.colors.onSurface,
+            dataIcon = rememberVectorPainter(image = Icons.Rounded.SdCard),
+            cardTitle = "Internal storage",
+            cardText = "1023 / 1024 bytes",
+            usedSpacePercentage = .99f,
+            onClick = { }
+        )
     }
 }

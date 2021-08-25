@@ -10,14 +10,12 @@ private val DarkColorPalette = darkColors(
     primary = Color1,
     primaryVariant = Color2,
     secondary = Color2,
-    onSurface = Color3
 )
 
 private val LightColorPalette = lightColors(
     primary = Color2,
     primaryVariant = Color2,
     secondary = Color2,
-    surface = Color1,
     onSurface = Color3
 
     /* Other default colors to override

@@ -129,7 +129,8 @@ fun ResourceTile(
             style = MaterialTheme.typography.body1.copy(
                 fontWeight = FontWeight.Bold,
                 fontSize = 12.sp
-            )
+            ),
+            color = MaterialTheme.colors.onSurface
         )
     }
 }
