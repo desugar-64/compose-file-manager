@@ -39,7 +39,7 @@ fun RoundedCornerButton(
             onClick = onClick,
             modifier = modifier
                 .background(
-                    color = MaterialTheme.colors.background,
+                    color = MaterialTheme.colors.background.copy(alpha = 0.5f),
                     shape = backgroundShape
                 )
                 .padding(8.dp)

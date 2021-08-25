@@ -51,8 +51,8 @@ fun HomeScreen(
                     state = StorageCardState(
                         cardLogo = Icons.Rounded.SdCard,
                         cardTitle = stringResource(R.string.card_internal_storage),
-//                        usedStorageBytes = (1024 / (index + 2)).toLong(),
-                        usedStorageBytes = (512).toLong(),
+                        usedStorageBytes = (1024 / (index + 2)).toLong(),
+//                        usedStorageBytes = (512).toLong(),
                         totalStorageBytes = 1024,
                         storageDataFormatter = { "$it bytes" }
                     )
