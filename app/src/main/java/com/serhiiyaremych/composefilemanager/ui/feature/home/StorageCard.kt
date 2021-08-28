@@ -28,18 +28,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.serhiiyaremych.composefilemanager.ext.darken
 import com.serhiiyaremych.composefilemanager.ext.lighten
-import com.serhiiyaremych.composefilemanager.ui.common.CircularProgressBar
+import com.serhiiyaremych.composefilemanager.ext.saturate
 import com.serhiiyaremych.composefilemanager.ui.theme.ComposeFileManagerTheme
 import com.serhiiyaremych.composefilemanager.ui.theme.Shapes
 import kotlin.math.roundToInt
@@ -64,44 +60,18 @@ fun StorageCard(
                 .shadow(elevation = 2.dp, Shapes.medium)
                 .clickable(onClick = onClick)
         ) {
-            val isLightTheme = MaterialTheme.colors.isLight
+            var targetValue by remember { mutableStateOf(0f) }
+
             val progress by animateFloatAsState(
-                targetValue = usedSpacePercentage,
+                targetValue = targetValue,
                 animationSpec = tween(durationMillis = 1500)
             )
-            val alpha = if (isLightTheme) 0.4f else 0.2f
-            val color = if (surfaceColor == Color.White)
-                surfaceColor.darken(0.2f)
-            else
-                surfaceColor.lighten(0.6f)
 
-            val progressLineColor = color.copy(alpha = alpha)
-            var containerSize by remember { mutableStateOf(Size.Zero) }
-
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        brush = Brush.verticalGradient(
-                            generateCardGradientColors(surfaceColor),
-                            endY = containerSize.height
-                        ),
-                        shape = Shapes.medium
-                    )
-                    .drawBehind {
-                        containerSize = size
-                        drawLine(
-                            color = progressLineColor,
-                            start = Offset(0f, size.height / 2),
-                            end = Offset(size.width * progress, size.height / 2),
-                            strokeWidth = size.height
-                        )
-                    }
-                    .padding(end = 10.dp),
-                contentAlignment = Alignment.TopEnd
-            ) {
-                BackgroundProgress(progress, surfaceColor, contentAccentColor, containerSize)
+            SideEffect {
+                targetValue = usedSpacePercentage
             }
+
+            BackgroundProgress(modifier = Modifier.fillMaxSize(), progress, surfaceColor)
 
             Column(
                 modifier = Modifier
@@ -153,51 +123,90 @@ fun StorageCard(
 
 @Composable
 private fun BackgroundProgress(
+    modifier: Modifier = Modifier,
     progress: Float,
     surfaceColor: Color,
-    contentAccentColor: Color,
-    containerSize: Size
 ) {
-    val textProgress = "${(progress * 100).roundToInt().coerceIn(0, 100)}%"
-    val textColorBackground = surfaceColor
-    val textProgressAlpha = if (contentAccentColor == Color.Black) 0.2f else 0.4f
-    val textColorForeground = contentAccentColor
-        .copy(alpha = textProgressAlpha)
-        .compositeOver(surfaceColor)
+    var containerSize by remember { mutableStateOf(Size.Zero) }
+    val alpha = if (MaterialTheme.colors.isLight) 0.3f else 0.2f
 
-    val textStyle = MaterialTheme.typography.h3.copy(
-        fontWeight = FontWeight.ExtraBold,
-        fontFamily = FontFamily.SansSerif,
-    )
-    val clipShapeForeground = remember(progress, containerSize) {
-        val width = containerSize.width * (1.0f - progress).coerceIn(0.0f, 1.0f)
-        ClipShape(
-            offset = Offset(
-                x = containerSize.width - width,
-                y = 0f
-            ),
-            size = containerSize.copy(width = width)
+    val color = if (surfaceColor == Color.White)
+        surfaceColor.darken(0.2f)
+    else
+        surfaceColor.lighten(0.6f)
+
+    val progressLineColor = color.copy(alpha = alpha)
+    val brush = remember(containerSize, surfaceColor) {
+        Brush.verticalGradient(
+            generateCardGradientColors(surfaceColor),
+            endY = containerSize.height
         )
     }
 
-    // Background text
-    Text(
-        modifier = Modifier.fillMaxWidth(),
-        text = textProgress,
-        style = textStyle,
-        color = textColorBackground,
-        textAlign = TextAlign.End
-    )
-    // Foreround Text
-    Text(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(clipShapeForeground),
-        text = textProgress,
-        style = textStyle,
-        color = textColorForeground,
-        textAlign = TextAlign.End
-    )
+    Box(contentAlignment = Alignment.TopEnd,
+        modifier = modifier
+            .background(
+                brush = brush,
+                shape = Shapes.medium
+            )
+            .drawBehind {
+                containerSize = size
+                val x = size.width * progress
+                drawLine(
+                    color = progressLineColor,
+                    start = Offset(0f, size.height / 2),
+                    end = Offset(x, size.height / 2),
+                    strokeWidth = size.height
+                )
+                drawLine(
+                    color = surfaceColor
+                        .lighten(0.4f)
+                        .saturate(1.7f)
+                        .copy(alpha = 0.4f),
+                    start = Offset(x, 0f),
+                    end = Offset(x, size.height),
+                    strokeWidth = 1.5.dp.toPx(),
+                )
+            }
+            .padding(end = 10.dp)) {
+        val textProgress = "${(progress * 100).roundToInt().coerceIn(0, 100)}%"
+        val textColorBackground = surfaceColor
+        val textColorForeground = textColorBackground.lighten(0.7f).saturate(1.5f)
+
+        val textStyle = MaterialTheme.typography.h3.copy(
+            fontWeight = FontWeight.ExtraBold,
+            fontFamily = FontFamily.SansSerif,
+        )
+        val clipShapeForeground = remember(progress, containerSize) {
+            val width = containerSize.width * (1.0f - progress).coerceIn(0.0f, 1.0f)
+            ClipShape(
+                offset = Offset(
+                    x = containerSize.width - width,
+                    y = 0f
+                ),
+                size = containerSize.copy(width = width)
+            )
+        }
+
+        // Background text
+        Text(
+            modifier = Modifier.fillMaxWidth(),
+            text = textProgress,
+            style = textStyle,
+            color = textColorBackground,
+            textAlign = TextAlign.End
+        )
+        // Foreround Text
+        Text(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(clipShapeForeground),
+            text = textProgress,
+            style = textStyle,
+            color = textColorForeground,
+            textAlign = TextAlign.End
+        )
+    }
 }
 
 private fun generateCardGradientColors(color: Color): List<Color> {
